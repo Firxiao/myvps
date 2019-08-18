@@ -1,0 +1,11 @@
+{
+    "listen": ":5000",
+    "mtu": 1400,
+    "sndwnd": 2048,
+    "rcvwnd": 2048,
+    "target": "127.0.0.1:1080",
+    "mode": "fast2",
+    "dscp": 46,
+    "crypt": "salsa20",
+    "key": "password"
+}

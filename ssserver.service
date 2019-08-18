@@ -1,0 +1,17 @@
+#/etc/systemd/system/ssserver.service
+
+[Unit]
+Description= lightweight secured socks5 proxy.
+Requires=network.target
+After=network-online.target
+
+[Service]
+Type=forking
+User=root
+ExecStart=/bin/ssserver -c /etc/ss/config.json --user nobody -d start
+ExecReload=/usr/bin/kill -HUP $MAINPID
+RestartSec=1min
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

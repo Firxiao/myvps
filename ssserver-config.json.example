@@ -1,0 +1,8 @@
+{
+    "port_password":{
+         "1080":"xxxxx"
+    },
+    "method":"camellia-256-cfb",
+    "fast_open": true,
+    "timeout":600
+}

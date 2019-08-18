@@ -1,0 +1,63 @@
+---
+- hosts: all
+  become: yes
+  vars: 
+    kcptun_download_url: https://github.com/xtaci/kcptun/releases/download/v20190809/kcptun-linux-amd64-20190809.tar.gz
+
+  handlers:
+    - name: reload systemd daemon
+      shell: systemctl daemon-reload
+    - name: restart kcptun-server service
+      service: name=kcptun-server state=restarted
+
+  tasks:
+    - name: Install kcptun server
+      unarchive: 
+        src: "{{ kcptun_download_url }}"
+        dest: /tmp
+        remote_src: yes
+    - name: Copy to /usr/local/bin
+      copy: 
+        src: /tmp/server_linux_amd64
+        dest: /usr/local/bin/kcptun_server
+        remote_src: True
+        owner: root
+        mode: 755
+      
+    - name: Add kcptun group
+      group:
+        name: kcptun
+    - name: add kcptun user into group
+      user:
+        name: kcptun
+        group: kcptun
+        system: True
+        shell: /sbin/nologin
+
+    - name: Create configuration folder /etc/kcptun
+      file: 
+        path: /etc/kcptun
+        state: directory
+        mode: '0755'
+  
+    - name: Copy configuration into /etc/kcptun
+      copy: 
+        src: ./kcptun-server-config.json
+        dest: /etc/kcptun/server.json
+        mode: '0400'
+        owner: kcptun
+      
+    - name: Install kcptun-server systemd service script
+      copy:
+        src: ./kcptun-server.service
+        dest: /etc/systemd/system/kcptun-server.service
+      when: ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "7"
+      notify:
+        - reload systemd daemon
+        - restart kcptun-server service
+
+    - name: Ensure kcptun-server is started and onboot
+      service:
+        name: kcptun-server
+        state: started
+        enabled: yes

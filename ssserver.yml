@@ -1,0 +1,58 @@
+---
+- hosts: all
+  become: yes
+
+  handlers:
+    - name: reload systemd daemon
+      shell: systemctl daemon-reload
+    - name: restart ssserver service
+      service: name=ssserver state=restarted
+
+  tasks:
+    - name: Enusre epel is installed
+      yum:
+        name: epel-release
+        state: present
+    
+    - name: Install python-pip
+      yum:
+        name: python-pip
+        state: present
+        enablerepo: "epel"
+  
+    - name: Ensure pip is updated
+      pip:
+        name: pip
+        state: latest
+
+    - name: Install shadowsocks via pip
+      pip: 
+       name: shadowsocks
+       state: present
+      
+    - name: Create configuration folder /etc/ssserver
+      file: 
+        path: /etc/ssserver
+        state: directory
+        mode: '0755'
+  
+    - name: Copy configuration into /etc/ssserver
+      copy: 
+        src: ./ssserver-config.json
+        dest: /etc/ssserver/config.json
+        mode: '0400'
+      
+    - name: Install ssserver systemd service script
+      copy:
+        src: ./ssserver.service
+        dest: /etc/systemd/system/ssserver.service
+      when: ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "7"
+      notify:
+        - reload systemd daemon
+        - restart ssserver service
+
+    - name: Ensure ssserver is started and onboot
+      service:
+        name: ssserver
+        state: started
+        enabled: yes

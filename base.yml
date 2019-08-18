@@ -1,0 +1,14 @@
+---
+- hosts: all
+  become: yes
+
+  tasks:
+  - name: Set timezone to Asia/Shanghai
+    timezone:
+      name: Asia/Shanghai
+
+  - name: Install some usefull packages
+    yum:
+      name: ['wget', 'bash-completion']
+      state: present
+       
