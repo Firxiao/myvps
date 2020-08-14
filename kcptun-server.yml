@@ -49,8 +49,8 @@
       
     - name: Install kcptun-server systemd service script
       copy:
-        src: ./kcptun-server.service
-        dest: /etc/systemd/system/kcptun-server.service
+        src: ./kcptun-server@.service
+        dest: /etc/systemd/system/kcptun-server@.service
       when: ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "7"
       notify:
         - reload systemd daemon

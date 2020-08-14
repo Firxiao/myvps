@@ -1,18 +1,18 @@
-#/etc/systemd/system/kcptun-server.service
+#/etc/systemd/system/kcptun-server@.service
 
 [Unit]
-Description=kcptun server
+Description=kcptun server for %I
 Requires=network.target
 After=network-online.target
-    
+
 [Service]
 Type=simple
 User=kcptun
 RemainAfterExit=yes
-ExecStart=/usr/local/bin/kcptun_server -c /etc/kcptun/server.json --quiet
-ExecReload=/usr/bin/kill -HUP 
+ExecStart=/usr/local/bin/kcptun_server -c /etc/kcptun/%i.json --quiet
+ExecReload=/usr/bin/kill -HUP
 RestartSec=1min
 Restart=on-failure
-    
+
 [Install]
 WantedBy=multi-user.target
